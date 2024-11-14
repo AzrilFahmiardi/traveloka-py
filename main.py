@@ -59,26 +59,22 @@ def print_menu(index):
         if i < len(menu_items_top) - 1:
             menu_text.append("    ")
     
-    # Add bottom menu items (centered)
     menu_text.append("\n\n")
     for item in menu_items_bottom:
         bottom_text = f"  {item}"
         padding = (max_width - len(bottom_text)) // 2
         menu_text.append(" " * padding + bottom_text)
     
-    # Navigation text - perbaikan centering
     nav_text = "← → : Navigate Menu | Enter : Select | r : Login/Registrate"
     padding = (max_width - len(nav_text)) // 2
     navigation = Text("\n\n" + " " * padding + nav_text)
     
-    # Combine all content
     content = Text.assemble(
         title, "\n\n",
         menu_text, "\n",
         navigation
     )
     
-    # Create and display panel with center aligned content
     welcome_panel = Panel(
         Align.center(content),
         width=100,
@@ -87,7 +83,6 @@ def print_menu(index):
         padding=(1, 2)
     )
     
-    # Print the panel
     console.print(Align.center(welcome_panel))
     
 
@@ -96,7 +91,6 @@ def main():
     last_key = None
     while True:
         os.system("cls")
-        # print_header()
         print_menu(index_menu)
 
 

@@ -15,5 +15,6 @@ def pause():
 def pesawat(index):
     os.system("cls")
     print("pesawat")
+    print("COMING SOON")
     
     pause()

@@ -15,5 +15,6 @@ def pause():
 def kereta(index):
     os.system("cls")
     print("kereta")
+    print("COMING SOON")
 
     pause()
