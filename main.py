@@ -15,12 +15,47 @@ from pesawat import *
 from kereta import *
 from loginorRegister import *
 
-
-
 import getpass
 
 init()
 console = Console()
+
+def print_panel(
+    content_items,
+    panel_title=None,
+    panel_width=100,
+    content_width=96,
+    panel_style="green",
+    center_align=True
+):
+    console = Console()
+    
+    content = Text()
+    
+    for i, item in enumerate(content_items):
+        if i > 0:
+            content.append("\n")
+        if isinstance(item, tuple):
+            text, style = item
+            if center_align:
+                padding = (content_width - len(text)) // 2
+                content.append(" " * padding)
+            content.append(text, style=style)
+        else:
+            if center_align:
+                padding = (content_width - len(item)) // 2
+                content.append(" " * padding)
+            content.append(item)
+    
+    panel = Panel(
+        Align.center(content) if center_align else content,
+        width=panel_width,
+        title=panel_title,
+        border_style=panel_style,
+        padding=(1, 2)
+    )
+    
+    console.print(Align.center(panel))
 
 def print_menu(index):
     title = Text("WELCOME TO RPLTICKET", style="bold green")
@@ -84,15 +119,17 @@ def print_menu(index):
     )
     
     console.print(Align.center(welcome_panel))
-    
 
 def main():
     index_menu = 0
     last_key = None
+    user_session = None
+
     while True:
         os.system("cls")
+        if user_session:
+            print_panel([f"logged in as :  {user_session['username']}"], center_align=False, panel_style="cyan")
         print_menu(index_menu)
-
 
         if keyboard.is_pressed("right") and last_key != "right":
             index_menu = 1
@@ -110,15 +147,13 @@ def main():
                 kereta(index_menu)
             last_key = "enter"
         elif keyboard.is_pressed("r") and last_key != "r":
-            loginOrRegister(index_menu)
+            user_session = loginOrRegister(index_menu)
             last_key = "r"
 
         if not (keyboard.is_pressed("down") or keyboard.is_pressed("up") or keyboard.is_pressed("enter") or keyboard.is_pressed("r") or keyboard.is_pressed("left") or keyboard.is_pressed("right")):
             last_key = None
 
         time.sleep(0.05) 
-    
 
 if __name__ == "__main__":
     main()
-

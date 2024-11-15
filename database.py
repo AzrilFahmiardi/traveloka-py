@@ -41,9 +41,8 @@ class Database:
         try:
             cursor.execute(query, (username, password))
             conn.commit()
-            console.print(f"\n[green]User {username} berhasil terdaftar!")
         except Exception as e:
-            console.print(f"[red]Error mendaftar user: {e}")
+            pass
         finally:
             cursor.close()
             conn.close() 
