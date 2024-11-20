@@ -87,3 +87,58 @@ class Database:
         finally:
             cursor.close()
             conn.close()
+
+    def get_ticket(kota_asal, kota_tujuan, tanggal):
+            conn = create_connection()
+            if conn is None:
+                return []
+                
+            cursor = conn.cursor()
+            query = "SELECT maskapai, seat_slot, jam_keberangkatan, jam_tiba, kelas, kota_asal, kota_tujuan, harga_tiket, tanggal, id_tiket FROM ticket  WHERE kota_asal=? AND kota_tujuan=? AND tanggal=?"
+            try:
+                cursor.execute(query,(kota_asal, kota_tujuan,tanggal))
+                users = cursor.fetchall()
+                return users
+            except sqlite3.Error as e:
+                console.print(f"[red]Error mengambil data ticket: {e}")
+                return []
+            finally:
+                cursor.close()
+                conn.close()
+        
+    
+    def get_all_ticket():
+        conn = create_connection()
+        if conn is None:
+            return []
+            
+        cursor = conn.cursor()
+        query = "SELECT maskapai, seat_slot, jam_keberangkatan, jam_tiba, kelas, kota_asal, kota_tujuan, harga_tiket, tanggal, id_tiket FROM ticket "
+        try:
+            cursor.execute(query)
+            users = cursor.fetchall()
+            return users
+        except sqlite3.Error as e:
+            console.print(f"[red]Error mengambil data ticket: {e}")
+            return []
+        finally:
+            cursor.close()
+
+    def get_ticket_byid(id):
+            conn = create_connection()
+            if conn is None:
+                return []
+                
+            cursor = conn.cursor()
+            query = "SELECT maskapai, seat_slot, jam_keberangkatan, jam_tiba, kelas, kota_asal, kota_tujuan, harga_tiket, tanggal, id_tiket FROM ticket  WHERE id_tiket=?"
+            try:
+                cursor.execute(query,(id))
+                users = cursor.fetchall()
+                return users
+            except sqlite3.Error as e:
+                console.print(f"[red]Error mengambil data ticket: {e}")
+                return []
+            finally:
+                cursor.close()
+                conn.close()
+            
