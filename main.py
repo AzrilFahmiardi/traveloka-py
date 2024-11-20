@@ -19,6 +19,19 @@ import getpass
 
 init()
 console = Console()
+terminal_width = os.get_terminal_size().columns
+form_width = 40 
+left_padding = (terminal_width - form_width) // 2
+padding = " " * left_padding
+
+def pause():
+    print("\nTekan Enter untuk kembali ke menu utama...")
+    while keyboard.is_pressed('enter'):
+        pass
+    while not keyboard.is_pressed('enter'):
+        time.sleep(0.05)
+    while keyboard.is_pressed('enter'):
+        pass
 
 def print_panel(
     content_items,
@@ -56,6 +69,12 @@ def print_panel(
     )
     
     console.print(Align.center(panel))
+
+def clear_input_buffer():
+    if os.name == 'nt':
+        import msvcrt
+        while msvcrt.kbhit():
+            _ = msvcrt.getch()
 
 def print_menu(index):
     title = Text("WELCOME TO RPLTICKET", style="bold green")
@@ -120,6 +139,33 @@ def print_menu(index):
     
     console.print(Align.center(welcome_panel))
 
+def topup(username):
+    clear_input_buffer()
+    console.print("\n" + padding + '[cyan]Masukkan jumlah uang : ', end='')
+    uang_topup = input()
+    status = Database.topup_db(uang_topup, username)
+
+    if status:
+        # Ambil data user yang telah diupdate
+        users = Database.get_users()
+        updated_session = None
+        for user in users:
+            if user[0] == username:
+                updated_session = {'username': username, 'uang': user[2], 'logged_in': True}
+                break
+        
+        console.print("\n" + padding + '[green]Top up berhasil!')
+        pause()
+        return updated_session
+    else:
+        console.print("\n" + padding + '[red]Top up gagal!')
+        pause()
+        return None
+    
+
+    
+
+
 def main():
     index_menu = 0
     last_key = None
@@ -128,7 +174,7 @@ def main():
     while True:
         os.system("cls")
         if user_session:
-            print_panel([f"logged in as :  {user_session['username']}"], center_align=False, panel_style="cyan")
+            print_panel([f"logged in as :  {user_session['username']}\t\t\t\t\t\tUang : Rp {user_session['uang']} (T to topup)"], center_align=False, panel_style="cyan")
         print_menu(index_menu)
 
         if keyboard.is_pressed("right") and last_key != "right":
@@ -140,11 +186,26 @@ def main():
         elif keyboard.is_pressed("up") and last_key != "up":
             index_menu = 0  
             last_key = "up"
+        elif keyboard.is_pressed("t") and last_key != "t":
+            index_menu = 0  
+            last_key = None
+            username = user_session['username']
+            updated_session = topup(username)
+            if updated_session:
+                user_session = updated_session
         elif keyboard.is_pressed("enter") and last_key != "enter":
             if index_menu == 0:
-               pesawat(index_menu)
+                if user_session:
+                    pesawat(index_menu, user_session)
+                else:
+                    console.print("\n" + padding + '[red]Silahkah Login terlebih dahulu')
+                    pause()
             elif index_menu == 1:
-                kereta(index_menu)
+                if user_session:
+                    kereta(index_menu, user_session)
+                else:
+                    console.print("\n" + padding + '[red]Silahkah Login terlebih dahulu')
+                    pause()
             last_key = "enter"
         elif keyboard.is_pressed("r") and last_key != "r":
             user_session = loginOrRegister(index_menu)

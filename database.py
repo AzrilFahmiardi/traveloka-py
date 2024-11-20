@@ -1,6 +1,7 @@
 import sqlite3
 from rich.console import Console
 
+
 console = Console()
 
 def create_connection():
@@ -32,7 +33,7 @@ class Database:
             return []
             
         cursor = conn.cursor()
-        query = "SELECT username, password FROM user"
+        query = "SELECT username, password, uang FROM user"
         try:
             cursor.execute(query)
             users = cursor.fetchall()
@@ -61,6 +62,27 @@ class Database:
             return False
         except sqlite3.Error as e:
             console.print(f"[red]Error saat registrasi: {e}")
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+
+    def topup_db(uang,username):
+        conn = create_connection()
+        if conn is None:
+            return False
+            
+        cursor = conn.cursor()
+        query = "UPDATE user SET uang = uang + ? WHERE username = ?"
+        try:
+            cursor.execute(query, (uang, username))
+            conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            # console.print("[yellow]Uang telah ditambahkan")
+            return False
+        except sqlite3.Error as e:
+            console.print(f"[red]Error saat topup: {e}")
             return False
         finally:
             cursor.close()

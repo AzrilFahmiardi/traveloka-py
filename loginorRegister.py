@@ -19,7 +19,7 @@ class User:
         users = Database.get_users()
         for user in users:
             if user[0] == self.username and user[1] == self.password:
-                return {'username': self.username, 'logged_in': True}
+                return {'username': self.username, 'uang': user[2] ,'logged_in': True}
         return None
     
     def register(self):
