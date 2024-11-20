@@ -146,7 +146,6 @@ def topup(username):
     status = Database.topup_db(uang_topup, username)
 
     if status:
-        # Ambil data user yang telah diupdate
         users = Database.get_users()
         updated_session = None
         for user in users:
