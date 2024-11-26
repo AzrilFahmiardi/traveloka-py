@@ -173,9 +173,9 @@ def loginOrRegister(index):
             return
         elif keyboard.is_pressed("enter") and last_key != "enter":
             if index_menu == 0:
-               user_session = login()
-               if user_session:
-                   return user_session
+                user_session = login()
+                if user_session:
+                    return user_session
             elif index_menu == 1:
                 register()
             last_key = "enter"

@@ -5,8 +5,16 @@ from rich.align import Align
 from rich.panel import Panel
 from rich.console import Console
 from rich.text import Text
+from rich.prompt import Prompt, Confirm
+from rich.progress import Progress
+
+
 
 from database import Database
+import pesanDanBayar as pb
+
+console = Console()
+
 
 
 terminal_width = os.get_terminal_size().columns
@@ -21,6 +29,7 @@ class Ticketing:
         self.data_tiket = data
         self.data_fitur = ['Ubah Tanggal: ', 'Ubah Keberangkatan: ', 'Ubah Tujuan: ','Filter: ', 'Berdasarkan Harga: ', 'Berdasarkan Jam Keberangkatan: ', 'Berdasarkan Maskapai: ', 'Berdasarkan Kelas: ', '(Q Untuk Kembali)'] 
         self.data_temp_filter = []
+        
         
     def format(self):
         for indeks in range (11) :
@@ -48,7 +57,7 @@ class Ticketing:
                 print('|' + format('LIST TIKET PESAWAT', ' ^48')+ '|')                          
             else:
                 print('Pilih Nomer Tiket Untuk Memesan Tiket')
-     
+    
     def format_tiket(self):
         for p in range(len(self.data_tiket)):
             for baris in range (5) :
@@ -64,12 +73,12 @@ class Ticketing:
                             print('|') 
                         else :
                             if baris == 1:
-                                print(f'{p+1}.', end=' ')
+                                console.print(f'[cyan]{p+1}.', end=' ')
                                 kolom += len(str(p+1)) + 2
                                 panjang1 = len(self.data_tiket[p][0])
                                 panjang2 = len(str(self.data_tiket[p][1])) + 9
                                 tambahan = 48 - kolom - panjang2 - panjang1
-                                print(self.data_tiket[p][0] + ' '*tambahan + str(self.data_tiket[p][1]) + ' Tersedia', end=' ')
+                                console.print('[cyan]'+self.data_tiket[p][0] + '(' + str(self.data_tiket[p][9]) + ')'+ '[white]'+ ' '*(tambahan-5 )+ str(self.data_tiket[p][1]) + ' Tersedia', end=' ')
                             elif baris == 2 :
                                 panjang1 = 14
                                 panjang2 = len(self.data_tiket[p][4])
@@ -142,6 +151,14 @@ def print_panel(
     
     console.print(Align.center(panel))
 
+def loading_bar():
+    with Progress() as progress:
+        task = progress.add_task(padding + "[cyan]Loading...", total=100)
+        while not progress.finished:
+            progress.update(task, advance=1)
+            time.sleep(0.03)
+    # Prompt.ask("Press Enter to continue...")  # Menunggu enter untuk lanjut
+
 def cari_tiket():
     clear_input_buffer()
     print(padding + "----------------------------------------------------")
@@ -151,33 +168,33 @@ def cari_tiket():
     kota_tujuan = input(padding + "🏙️ Kota Tujuan        : ")
     tanggal = input(padding + "📅 Tanggal Keberangkatan (dd-mm-yyyy) : ")
     
-    print("\n" + padding + "----------------------------------------------------")
-    print(padding + "|               🎫 PILIH KELAS PERJALANAN          |")
-    print(padding + "----------------------------------------------------")
-    print(padding + "   [1] Ekonomi")
-    print(padding + "   [2] Bisnis")
-    print(padding + "   [3] Eksekutif")
+    # print("\n" + padding + "----------------------------------------------------")
+    # print(padding + "|               🎫 PILIH KELAS PERJALANAN          |")
+    # print(padding + "----------------------------------------------------")
+    # print(padding + "   [1] Ekonomi")
+    # print(padding + "   [2] Bisnis")
+    # print(padding + "   [3] Eksekutif")
     
-    while True:
-        try:
-            pilihan_kelas = int(input("\n" + padding +  "> Pilih kelas dengan mengetik nomor: "))
-            if pilihan_kelas not in [1, 2, 3]:
-                raise ValueError(padding + "Nomor yang dimasukkan harus 1, 2, atau 3.")
-            break
-        except ValueError as e:
-            print(padding + f"Input tidak valid: {e}")
+    # while True:
+    #     try:
+    #         pilihan_kelas = int(input("\n" + padding +  "> Pilih kelas dengan mengetik nomor: "))
+    #         if pilihan_kelas not in [1, 2, 3]:
+    #             raise ValueError(padding + "Nomor yang dimasukkan harus 1, 2, atau 3.")
+    #         break
+    #     except ValueError as e:
+    #         print(padding + f"Input tidak valid: {e}")
     
-    kelas = {1: "Ekonomi", 2: "Bisnis", 3: "Eksekutif"}[pilihan_kelas]
+    # kelas = {1: "Ekonomi", 2: "Bisnis", 3: "Eksekutif"}[pilihan_kelas]
     
     print("\n" +  padding +  "----------------------------------------------------")
-    print(padding + "[ Cari Tiket ]                              [ Batal ]")
+    console.print(padding + "[green][ Cari Tiket ]                              [red][ Batal ]")
     print(padding + "----------------------------------------------------")
     
     while True:
-        konfirmasi = input("\n> Ketik 'Cari' untuk melanjutkan atau 'Batal' untuk membatalkan: ").strip().lower()
+        konfirmasi = input("\n" + padding + "> Ketik 'Cari' untuk melanjutkan atau 'Batal' untuk membatalkan\n " + padding + ": ").strip().lower()
         if konfirmasi == "cari":
             print("\n" +  padding +  "Pencarian tiket sedang diproses...")
-            # list_tiket(kota_asal, kota_tujuan, tanggal)
+            loading_bar()
             return {'asal':kota_asal, 'tujuan':kota_tujuan, 'tanggal': tanggal}
         elif konfirmasi == "batal":
             print("\n" +  padding +  "Pencarian tiket dibatalkan.")
@@ -208,10 +225,14 @@ def pesawat(index, user_session):
             tujuan = filter['tujuan']
             tanggal = filter['tanggal']
             list_tiket(asal,tujuan,tanggal)
+            
 
-            id_tiket = input("Masukkan id tiket: ")
+            id_tiket = console.input("[green]Masukkan id tiket: ")
             print('id tiket yg dipilih : ', id_tiket)
+            # detail_tiket(id_tiket, user_session)
+            updated_session = pb.menu(id_tiket, user_session)
+
 
 
             pause()
-            break
+            return updated_session
