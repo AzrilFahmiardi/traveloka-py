@@ -121,7 +121,7 @@ def print_menu(index):
         padding = (max_width - len(bottom_text)) // 2
         menu_text.append(" " * padding + bottom_text)
     
-    nav_text = "← → : Navigate Menu | Enter : Select | r : Login/Registrate  |  A : Admin"
+    nav_text = "← → : Navigate Menu | e : exit | r : Login/Registrate  |  A : Admin"
     padding = (max_width - len(nav_text)) // 2
     navigation = Text("\n\n" + " " * padding + nav_text)
     
@@ -198,6 +198,8 @@ def main():
             index_menu = 0  
             last_key = 'a'
             admin_menu(user_session)
+        elif keyboard.is_pressed("e") and last_key != "e":
+            return
         elif keyboard.is_pressed("enter") and last_key != "enter":
             if index_menu == 0:
                 if user_session:
